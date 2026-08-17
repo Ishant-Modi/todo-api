@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+
+app.use(express.json());
+
 let tasks = [
   { id: 1, title: "Buy milk", done: false },
   { id: 2, title: "Walk the dog", done: true },
@@ -31,6 +34,23 @@ app.get('/tasks/:id', (req, res) => {
   }
 
   res.json(task);
+});
+
+app.post('/tasks', (req, res) => {
+  const { title } = req.body;
+
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: "Title is required" });
+  }
+
+  const newTask = {
+    id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
+    title,
+    done: false
+  };
+
+  tasks.push(newTask);
+  res.status(201).json(newTask);
 });
 
 app.listen(PORT, () => {
